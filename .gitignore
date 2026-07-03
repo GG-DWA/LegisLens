@@ -216,3 +216,16 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local secrets
+.env.*
+*.key
+*.pem
+
+# Local folders
+old/
+README-local.md
+
+# Optional editor settings
+.vscode/
+.idea/

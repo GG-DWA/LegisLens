@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegisLens</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        rel="stylesheet"
+    >
+
+    <link
+    rel="stylesheet"
+    href="/static/css/style.css"
+>
+  
+</head>
+
+<body>
+
+<div class="container py-5">
+
+    <h1 class="mb-3">LegisLens</h1>
+
+    <p class="text-muted">
+        Comprendre rapidement l'empreinte d'une loi à partir des données officielles.
+    </p>
+
+    <section class="search-zone">
+
+        <h2 class="h3 mb-4">Rechercher un texte officiel</h2>
+
+        <form id="official-search-form">
+
+            <div class="input-group mb-4">
+                <input
+                    id="official-query"
+                    class="form-control main-search-input"
+                    placeholder="Exemple : loi 2015-988, accessibilité téléphonique, ordonnance 2023-857, Code de la consommation"
+                    required
+                >
+
+                <button type="submit" class="btn main-search-button">
+                    Rechercher
+                </button>
+            </div>
+
+            <button
+                type="button"
+                id="toggle-options"
+                class="btn btn-legis-outline mb-3"
+            >
+                → Options de recherche
+            </button>
+
+            <div id="search-options" class="options-box d-none">
+
+                <div class="row g-3">
+
+                    <div class="col-md-3">
+                        <label class="form-label">Fonds</label>
+                        <select id="search-fond" class="form-select">
+                            <option value="ALL">Tous les fonds</option>
+                            <option value="CODE">Codes</option>
+                            <option value="LEGI">Textes consolidés</option>
+                            <option value="JORF">Journal officiel</option>
+                            <option value="CONSTIT">Jurisprudence constitutionnelle</option>
+                            <option value="CIRC">Circulaires et instructions</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Type de document</label>
+                        <select id="search-nature" class="form-select">
+                            <option value="ALL">Tous les types</option>
+                            <option value="LOI">Lois</option>
+                            <option value="ORDONNANCE">Ordonnances</option>
+                            <option value="DECRET">Décrets</option>
+                            <option value="ARRETE">Arrêtés</option>
+                            <option value="RAPPORT">Rapports</option>
+                            <option value="AVIS">Avis</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Zone de recherche</label>
+                        <select id="search-zone" class="form-select">
+                            <option value="AUTO">Détection automatique</option>
+                            <option value="ALL">Dans tous les champs</option>
+                            <option value="TITLE">Dans les titres</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Résultats par page</label>
+                        <select id="page-size" class="form-select">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="25">25</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="mt-4 d-flex flex-wrap gap-4">
+
+                    <div class="form-check form-switch">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="exact-search"
+                        >
+                        <label class="form-check-label" for="exact-search">
+                            Rechercher l'expression exacte
+                        </label>
+                    </div>
+
+                    <div class="form-check form-switch">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="only-active"
+                        >
+                        <label class="form-check-label" for="only-active">
+                            Afficher uniquement les contenus en vigueur
+                        </label>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </section>
+
+    <div id="official-results"></div>
+
+    <div id="citizen-analysis"></div>
+
+</div>
+
+<script>
+
+let currentPage = 1;
+let currentQuery = "";
+let currentFond = "ALL";
+let currentNature = "ALL";
+let currentZone = "ALL";
+let currentExact = false;
+let currentOnlyActive = false;
+let currentPageSize = 10;
+
+const natureLabels = {
+    "PROJET_LOI": "Projet de loi",
+    "PROPOSITION_LOI": "Proposition de loi",
+    "LOI": "Loi",
+    "ORDONNANCE": "Ordonnance",
+    "DECRET": "Décret",
+    "DÉCRET": "Décret",
+    "ARRETE": "Arrêté",
+    "ARRÊTÉ": "Arrêté",
+    "AVIS": "Avis",
+    "RAPPORT": "Rapport",
+    "CODE": "Code",
+    "CONSTITUTION": "Constitution"
+};
+
+function formatDate(dateValue) {
+    if (!dateValue || isTechnicalDate(dateValue)) {
+        return "";
+    }
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+        return dateValue;
+    }
+
+    return date.toLocaleDateString("fr-FR", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+    });
+}
+
+function isTechnicalDate(dateValue) {
+    return ["2999-01-01", "2222-02-22"].includes(dateValue);
+}
+
+function getAnalyzeButtonLabel(item) {
+    const nature = item.nature ?? "";
+
+    if (nature === "LOI") return "Comprendre cette loi";
+    if (nature === "ORDONNANCE") return "Comprendre cette ordonnance";
+    if (nature === "DECRET" || nature === "DÉCRET") return "Comprendre ce décret";
+    if (nature === "ARRETE" || nature === "ARRÊTÉ") return "Comprendre cet arrêté";
+    if (nature === "CONSTITUTION") return "Comprendre cette Constitution";
+
+    return "Analyser ce texte";
+}
+
+function getLegifranceUrl(item) {
+    if (!item) return null;
+
+    const id = item.id ?? "";
+    const cid = item.cid ?? "";
+    const origin = item.origin ?? "";
+
+    if (origin === "LEGI" || origin === "LODA" || origin === "CODE") {
+        return `https://www.legifrance.gouv.fr/loda/id/${id}`;
+    }
+
+    if (origin === "JORF") {
+        return `https://www.legifrance.gouv.fr/jorf/id/${cid || id}`;
+    }
+
+    return null;
+}
+
+function extractImpactedCodes(legalChanges) {
+    const codes = new Set();
+
+    legalChanges.forEach(change => {
+        const target = change.target ?? "";
+        const match = target.match(/(Code\s+.*?)(?=\s+Art\.|$)/i);
+
+        if (match && match[1]) {
+            codes.add(match[1].trim().replace(/\.$/, ""));
+        }
+    });
+
+    return Array.from(codes);
+}
+
+document
+    .getElementById("toggle-options")
+    .addEventListener("click", () => {
+
+        document
+            .getElementById("search-options")
+            .classList.toggle("d-none");
+
+    });
+
+
+document
+    .getElementById("official-search-form")
+    .addEventListener("submit", async (e) => {
+
+        e.preventDefault();
+
+        currentPage = 1;
+
+        currentQuery =
+            document.getElementById("official-query").value.trim();
+
+        currentFond =
+            document.getElementById("search-fond").value;
+
+        currentNature =
+            document.getElementById("search-nature").value;
+
+        currentZone =
+            document.getElementById("search-zone").value;
+
+        currentExact =
+            document.getElementById("exact-search").checked;
+
+        currentOnlyActive =
+            document.getElementById("only-active").checked;
+
+        currentPageSize =
+            Number(document.getElementById("page-size").value);
+
+        await searchDocuments();
+
+});
+
+
+async function searchDocuments() {
+
+    const url =
+        `/api/official-search-v2?` +
+        `query=${encodeURIComponent(currentQuery)}` +
+        `&fond=${currentFond}` +
+        `&zone=${currentZone === "AUTO" ? "ALL" : currentZone}` +
+        `&nature=${currentNature}` +
+        `&exact=${currentExact}` +
+        `&only_active=${currentOnlyActive}` +
+        `&page_number=${currentPage}` +
+        `&page_size=${currentPageSize}`;
+
+    const response = await fetch(url);
+
+    const data = await response.json();
+
+    renderResults(data);
+
+}
+
+
+function renderResults(data) {
+
+    const container =
+        document.getElementById("official-results");
+
+    container.innerHTML = "";
+
+    if (!data.results || data.results.length === 0) {
+
+        container.innerHTML = `
+            <div class="alert alert-warning">
+                Aucun résultat trouvé.
+            </div>
+        `;
+
+        return;
+
+    }
+
+    container.innerHTML += `
+        <div class="mb-4">
+
+         <h4>Filtres utilisés</h4>
+
+<div><strong>Fonds :</strong> ${currentFond}</div>
+
+<div><strong>Type :</strong> ${currentNature}</div>
+
+<div>
+    <strong>Zone :</strong>
+    ${currentZone === "AUTO" ? "Détection automatique" : currentZone}
+</div>
+
+            <br>
+
+            <div>
+                <strong>Résultats pertinents repérés :</strong>
+                ${data.total ?? data.count ?? data.results?.length ?? 0}
+            </div>
+
+            <div>
+                <strong>Résultats affichés :</strong>
+                ${data.results.length}
+            </div>
+
+            <p class="text-muted mt-2">
+                Les résultats sont paginés.
+                LegisLens ajoute ensuite une couche
+                d'analyse citoyenne sur le document choisi.
+            </p>
+
+        </div>
+    `;
+
+    data.results.forEach(item => {
+
+        const nature =
+            natureLabels[item.nature] ?? item.nature;
+
+        const legislationLink =
+            getLegifranceUrl(item);
+
+        container.innerHTML += `
+
+<div class="card shadow-sm mb-3 result-card">
+
+<div class="card-body">
+
+<div class="d-flex justify-content-between">
+
+<div>
+
+<span class="badge bg-primary">
+${nature}
+</span>
+
+${item.jurisState ?
+`<span class="badge bg-success">
+${item.jurisState}
+</span>`
+: ""}
+
+<span class="badge badge-origin">
+${item.origin}
+</span>
+
+</div>
+
+</div>
+
+<h5 class="mt-3">
+
+${item.title}
+
+</h5>
+
+${item.summary ?
+`<p class="text-muted">
+${item.summary}
+</p>`
+: ""}
+
+<div class="small">
+
+<div>
+
+<strong>Identifiant :</strong>
+
+${item.id}
+
+</div>
+
+${
+    item.date && !isTechnicalDate(item.date)
+        ? `
+            <div>
+                <strong>Date :</strong>
+                ${formatDate(item.date)}
+            </div>
+        `
+        : ""
+}
+
+</div>
+
+<div class="mt-3 d-flex flex-wrap gap-2">
+
+<button
+class="btn btn-primary"
+onclick="analyzeDocument(
+'${item.id}',
+'${item.origin}'
+)">
+${getAnalyzeButtonLabel(item)}
+</button>
+
+${legislationLink ?
+
+`<a
+href="${legislationLink}"
+target="_blank"
+class="btn btn-outline-secondary">
+
+<i class="bi bi-box-arrow-up-right"></i>
+
+Voir sur Légifrance
+
+</a>`
+
+: ""}
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+    });
+
+    renderPagination(data);
+
+}
+
+
+function renderPagination(data) {
+    const totalResults =
+        data.total ?? data.count ?? data.results?.length ?? 0;
+
+    const totalPages =
+        Math.ceil(totalResults / currentPageSize);
+
+    if (totalPages <= 1) {
+        return;
+    }
+
+    const container =
+        document.getElementById("official-results");
+
+    let html =
+        `<nav class="mt-4"><ul class="pagination">`;
+
+    for (let page = 1; page <= totalPages; page++) {
+        html += `
+            <li class="page-item ${page === currentPage ? "active" : ""}">
+                <a
+                    class="page-link"
+                    href="#"
+                    onclick="goToPage(${page}); return false;"
+                >
+                    ${page}
+                </a>
+            </li>
+        `;
+    }
+
+    html += "</ul></nav>";
+
+    container.innerHTML += html;
+}
+
+
+async function goToPage(page) {
+
+    currentPage = page;
+
+    await searchDocuments();
+
+}
+
+
+async function analyzeDocument(id, origin) {
+    const container =
+        document.getElementById("citizen-analysis");
+
+    container.innerHTML = `
+        <div class="alert alert-info my-4">
+            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+            Analyse du texte officiel en cours...
+        </div>
+    `;
+
+    container.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+    try {
+        const response =
+            await fetch(
+                `/api/citizen-analysis/text/${id}?origin=${origin}`
+            );
+
+        const analysis =
+            await response.json();
+
+        renderCitizenAnalysis(analysis);
+
+        container.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
+    } catch (error) {
+        container.innerHTML = `
+            <div class="alert alert-danger my-4">
+                Une erreur est survenue pendant l'analyse.
+            </div>
+        `;
+
+        container.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    }
+}
+
+function findFootprint(footprint, keywords) {
+    return footprint.find(item => {
+        const target = item.target?.toLowerCase() ?? "";
+        return keywords.some(keyword => target.includes(keyword));
+    });
+}
+
+function getParliamentaryIcon(step) {
+    const value = step.toLowerCase();
+
+    if (value.includes("sénat")) return "bi-bank";
+    if (value.includes("assemblée")) return "bi-building";
+    if (value.includes("cmp")) return "bi-people";
+    if (value.includes("débat")) return "bi-chat-dots";
+    if (value.includes("compte rendu")) return "bi-file-text";
+    if (value.includes("document")) return "bi-folder2-open";
+    if (value.includes("dossier")) return "bi-journal-text";
+
+    return "bi-check-circle";
+}
+
+function getPromulgationDate(timeline) {
+    return timeline.find(item => item.label === "Promulgation")?.date ?? "";
+}
+
+function getBaseLegiId(source, legiId) {
+    if (legiId) return legiId;
+
+    const id = source?.id ?? "";
+
+    if (id.startsWith("LEGITEXT")) {
+        return id.split("_")[0];
+    }
+
+    return "N/A";
+}
+
+function renderCitizenAnalysis(data) {
+    const container =
+        document.getElementById("citizen-analysis");
+
+    const answer = data.answer ?? {};
+    const source = data.source ?? {};
+    const sources = data.sources ?? [];
+
+    const actors = answer.actors ?? [];
+    const sectors = answer.impacted_sectors ?? [];
+    const footprint = answer.law_footprint ?? [];
+    const changes = answer.concrete_changes ?? [];
+    const attentionPoints = answer.attention_points ?? [];
+
+    const parliamentaryPath =
+        data.parliamentary_path?.steps ?? [];
+
+    const timeline =
+        data.parliamentary_path?.timeline ?? [];
+
+    const realParliamentaryPath =
+        data.real_parliamentary_path ?? null;
+
+    const realParliamentarySteps =
+        realParliamentaryPath?.steps?.known_steps ?? [];
+
+    const legalChanges =
+        data.legal_changes ?? [];
+
+    const createdChanges =
+        legalChanges.filter(change => change.type === "created");
+
+    const modifiedChanges =
+        legalChanges.filter(change => change.type === "modified");
+
+    const impactedCodes =
+        extractImpactedCodes(legalChanges);
+
+    const citizenImpact =
+        findFootprint(footprint, ["citoyen"]);
+
+    const businessImpact =
+        findFootprint(footprint, ["entreprise"]);
+
+    const publicImpact =
+        findFootprint(
+            footprint,
+            ["collectivité", "collectivités", "administration"]
+        );
+
+    const sourceLegiUrl =
+    source?.id?.startsWith("LEGITEXT")
+        ? `https://www.legifrance.gouv.fr/loda/id/${source.id.split("_")[0]}`
+        : null;
+
+    const sourceJorfUrl =
+        source?.cid
+            ? `https://www.legifrance.gouv.fr/jorf/id/${source.cid}`
+            : null;
+
+    const dossierUrl =
+        realParliamentaryPath?.dossier_id
+            ? `https://www.legifrance.gouv.fr/dossierlegislatif/${realParliamentaryPath.dossier_id}`
+            : null;
+
+    const promulgationDate =
+        getPromulgationDate(timeline);
+
+    const baseLegiId =
+        getBaseLegiId(source, data.legi_id);
+
+    const hasUsefulAnalysis =
+    answer.overview ||
+    actors.length > 0 ||
+    sectors.length > 0 ||
+    footprint.length > 0 ||
+    legalChanges.length > 0 ||
+    changes.length > 0;
+
+if (!hasUsefulAnalysis) {
+    container.innerHTML = `
+        <div class="card shadow-sm mb-5">
+            <div class="card-body">
+                <h2 class="h4">
+                    Analyse LegisLens : ${data.query ?? data.text_id ?? ""}
+                </h2>
+
+                <div class="alert alert-warning mt-3">
+                    ${answer.limits ?? "Ce document a été repéré, mais son contenu n'a pas pu être consulté automatiquement pour l'analyse."}
+                </div>
+
+                <p class="text-muted small mb-0">
+                    Identifiant : ${data.text_id ?? source?.id ?? "N/A"}
+                </p>
+            </div>
+        </div>
+    `;
+
+    container.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+    return;
+}
+
+    container.innerHTML = `
+        <div class="card shadow-sm mb-5">
+            <div class="card-body">
+
+                <h2 class="h4">
+                    Analyse LegisLens : ${data.query ?? ""}
+                </h2>
+
+                <div class="alert alert-success mt-3">
+                    <strong>
+                        <i class="bi bi-clipboard-check"></i>
+                        Statut de consultation
+                    </strong><br>
+
+                    Texte sélectionné :
+                    ${data.selected_origin ?? "N/A"}<br>
+
+                    Version analysée :
+                    ${data.resolved_origin ?? "N/A"}<br>
+
+                    ${
+                        data.legi_id
+                        ? `Identifiant LEGI : ${data.legi_id}<br>`
+                        : ""
+                    }
+
+                    ${
+                        data.jurisState
+                        ? `État juridique : <strong>${data.jurisState}</strong><br>`
+                        : ""
+                    }
+
+                    ${
+                        data.textAbroge !== undefined && data.textAbroge !== null
+                        ? `Texte abrogé : ${data.textAbroge ? "Oui" : "Non"}`
+                        : ""
+                    }
+                </div>
+
+                <h3 class="h5 mt-4">
+                    <i class="bi bi-file-earmark-text"></i>
+                    Fiche d'identité du texte
+                </h3>
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <strong>Nature</strong><br>
+                                ${source?.nature ?? "N/A"}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <strong>Date de promulgation</strong><br>
+                                ${
+                                    promulgationDate
+                                    ? formatDate(promulgationDate)
+                                    : "Non précisée"
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <strong>État juridique</strong><br>
+                                ${data.jurisState ?? source?.jurisState ?? "Non précisé"}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <strong>Version analysée</strong><br>
+                                ${
+    source?.dateDebutVersion &&
+    !isTechnicalDate(source.dateDebutVersion)
+        ? `Version consolidée en vigueur depuis le ${formatDate(source.dateDebutVersion)}`
+        : "Version en vigueur"
+}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <strong>Identifiant LEGI</strong><br>
+                                ${baseLegiId}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <strong>Identifiant JORF</strong><br>
+                                ${source?.cid ?? "N/A"}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <h3 class="h5 mt-4">
+                    <i class="bi bi-link-45deg"></i>
+                    Liens officiels
+                </h3>
+
+                <div class="d-flex flex-wrap gap-2">
+
+                    ${
+                        sourceLegiUrl
+                        ? `
+                            <a
+                                class="btn btn-legis-outline btn-sm"
+                                href="${sourceLegiUrl}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Texte consolidé Légifrance
+                            </a>
+                        `
+                        : ""
+                    }
+
+                    ${
+                        sourceJorfUrl
+                        ? `
+                            <a
+                                class="btn btn-legis-outline btn-sm"
+                                href="${sourceJorfUrl}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Journal officiel
+                            </a>
+                        `
+                        : ""
+                    }
+
+                    ${
+                        dossierUrl
+                        ? `
+                            <a
+                                class="btn btn-legis-outline btn-sm"
+                                href="${dossierUrl}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Dossier législatif
+                            </a>
+                        `
+                        : ""
+                    }
+
+                </div>
+
+<h3 class="h5 mt-4">
+    <i class="bi bi-download"></i>
+    Actions
+</h3>
+
+<div class="d-flex flex-wrap gap-2">
+
+  <a
+    class="btn btn-danger"
+    href="/api/citizen-analysis/pdf/${data.text_id}?origin=${data.selected_origin ?? data.resolved_origin ?? "LEGI"}"
+    target="_blank"
+    rel="noopener noreferrer"
+>
+    <i class="bi bi-file-earmark-pdf-fill"></i>
+    Exporter l'analyse en PDF
+</a>
+
+</div>
+
+                                <hr class="my-4">
+
+                <h3 class="h5">
+                    <i class="bi bi-signpost-2"></i>
+                    Parcours du texte
+                </h3>
+
+                <div class="timeline mb-5">
+
+                    ${parliamentaryPath.map(step => `
+
+                        <div class="d-flex mb-4">
+
+                            <div class="me-3">
+
+                                <span class="timeline-dot">
+
+                                    ${
+                                        step.status === "done"
+                                        ? '<i class="bi bi-check-circle-fill text-success fs-4"></i>'
+                                        : '<i class="bi bi-circle text-secondary fs-4"></i>'
+                                    }
+
+                                </span>
+
+                            </div>
+
+                            <div>
+
+                                <strong>${step.label}</strong>
+
+                                <div class="text-muted">
+
+                                    ${step.description}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    `).join("")}
+
+                </div>
+
+
+
+                ${realParliamentaryPath ? `
+
+                <h3 class="h5">
+
+                    <i class="bi bi-building"></i>
+
+                    Parcours parlementaire réel
+
+                </h3>
+
+                ${realParliamentaryPath.dossier_id ? `
+
+                    <p>
+
+                        <strong>Dossier législatif :</strong>
+
+                        ${realParliamentaryPath.dossier_id}
+
+                    </p>
+
+                ` : ""}
+
+
+
+                <div class="timeline mb-5">
+
+                    ${realParliamentarySteps.map(step => `
+
+                        <div class="d-flex mb-4">
+
+                            <div class="me-3">
+
+                                <i class="bi ${getParliamentaryIcon(step)} text-primary fs-4"></i>
+
+                            </div>
+
+                            <div>
+
+                                ${step}
+
+                            </div>
+
+                        </div>
+
+                    `).join("")}
+
+                </div>
+
+                ` : ""}
+
+
+
+                <h3 class="h5">
+
+                    <i class="bi bi-clock-history"></i>
+
+                    Chronologie du texte
+
+                </h3>
+
+                <div class="timeline mb-5">
+
+                    ${timeline.map(item => `
+
+                        <div class="d-flex mb-4">
+
+                            <div class="me-3">
+
+                                <i class="bi bi-calendar-event text-primary fs-4"></i>
+
+                            </div>
+
+                            <div>
+
+                                <strong>
+
+                                   ${
+    item.date && !isTechnicalDate(item.date)
+        ? formatDate(item.date)
+        : "Aujourd'hui"
+}
+
+                                </strong>
+
+                                —
+
+                                <strong>
+
+                                    ${item.label}
+
+                                </strong>
+
+                                <div class="text-muted">
+
+                                    ${item.description}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    `).join("")}
+
+                </div>
+
+                <hr class="my-4">
+
+                                <h3 class="h5">
+                    <i class="bi bi-eye"></i>
+                    Vue d'ensemble
+                </h3>
+
+                <p>
+                    ${answer.overview ?? "Aucune vue d'ensemble disponible."}
+                </p>
+
+                ${
+                    answer.limits
+                    ? `
+                        <div class="alert alert-warning">
+                            ${answer.limits}
+                        </div>
+                    `
+                    : ""
+                }
+
+                <h3 class="h5 mt-4">
+                    <i class="bi bi-people"></i>
+                    Acteurs concernés (${actors.length})
+                </h3>
+
+                <div class="row g-3">
+
+                    ${actors.map(actor => `
+
+                        <div class="col-md-4">
+
+                            <div class="card h-100">
+
+                                <div class="card-body">
+
+                                    <strong>${actor.name}</strong>
+
+                                    <p class="text-muted small mt-2 mb-0">
+
+                                        ${actor.reason}
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    `).join("")}
+
+                </div>
+
+
+
+                <h3 class="h5 mt-4">
+                    <i class="bi bi-diagram-3"></i>
+                    Secteurs impactés (${sectors.length})
+                </h3>
+
+                <div class="row g-3">
+
+                    ${sectors.map(sector => `
+
+                        <div class="col-md-4">
+
+                            <div class="card h-100">
+
+                                <div class="card-body">
+
+                                    <strong>${sector.name}</strong>
+
+                                    <p class="text-muted small mt-2 mb-0">
+
+                                        ${sector.reason}
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    `).join("")}
+
+                </div>
+
+
+
+                <h3 class="h5 mt-4">
+                    <i class="bi bi-broadcast"></i>
+                    Empreinte de la loi
+                </h3>
+
+                <div class="row g-3">
+
+                    ${footprint.map(item => `
+
+                        <div class="col-md-4">
+
+                            <div class="card h-100">
+
+                                <div class="card-body">
+
+                                    <strong>${item.target}</strong>
+
+                                    <p class="text-muted small mt-2 mb-0">
+
+                                        ${item.impact}
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    `).join("")}
+
+                </div>
+
+
+
+                <h3 class="h5 mt-4">
+                    <i class="bi bi-grid-3x3-gap"></i>
+                    Carte d'impact
+                </h3>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6 col-lg-3">
+
+                        <div class="card h-100 border-primary">
+
+                            <div class="card-body">
+
+                                <i class="bi bi-people-fill impact-icon"></i>
+
+                                <h4 class="h6 mt-2">
+
+                                    Citoyens
+
+                                </h4>
+
+                                <p class="small mb-0">
+
+                                    ${citizenImpact?.impact ?? "Impact citoyen à préciser."}
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="col-md-6 col-lg-3">
+
+                        <div class="card h-100 border-primary">
+
+                            <div class="card-body">
+
+                                <i class="bi bi-building impact-icon"></i>
+
+                                <h4 class="h6 mt-2">
+
+                                    Entreprises
+
+                                </h4>
+
+                                <p class="small mb-0">
+
+                                    ${businessImpact?.impact ?? "Impact entreprises à préciser."}
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="col-md-6 col-lg-3">
+
+                        <div class="card h-100 border-primary">
+
+                            <div class="card-body">
+
+                                <i class="bi bi-bank impact-icon"></i>
+
+                                <h4 class="h6 mt-2">
+
+                                    Administrations / collectivités
+
+                                </h4>
+
+                                <p class="small mb-0">
+
+                                    ${publicImpact?.impact ?? "Impact administrations / collectivités à préciser."}
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="col-md-6 col-lg-3">
+
+                        <div class="card h-100 border-primary">
+
+                            <div class="card-body">
+
+                                <i class="bi bi-journal-text impact-icon"></i>
+
+                                <h4 class="h6 mt-2">
+
+                                    Secteurs concernés
+
+                                </h4>
+
+                                <p class="small mb-0">
+
+                                    ${sectors.map(sector => sector.name).join(", ") || "Secteurs à préciser."}
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <hr class="my-4">
+                                ${
+                    impactedCodes.length > 0
+                    ? `
+                        <h3 class="h5 mt-4">
+                            <i class="bi bi-journal-code"></i>
+                            Codes impactés
+                        </h3>
+
+                        <div class="d-flex flex-wrap gap-2">
+
+                            ${impactedCodes.map(code => `
+
+                                <span class="badge bg-light text-dark border p-2">
+
+                                    ${code}
+
+                                </span>
+
+                            `).join("")}
+
+                        </div>
+                    `
+                    : ""
+                }
+
+
+
+                ${
+                    legalChanges.length > 0
+                    ? `
+                        <h3 class="h5 mt-4">
+                            <i class="bi bi-pencil-square"></i>
+                            Articles créés ou modifiés
+                        </h3>
+
+
+
+                        ${
+                            createdChanges.length > 0
+                            ? `
+                                <h4 class="h6 mt-3">
+                                    Dispositions créées (${createdChanges.length})
+                                </h4>
+
+                                <div class="row g-3">
+
+                                    ${createdChanges.map(change => `
+
+                                        <div class="col-md-6">
+
+                                            <div class="card h-100 border-success">
+
+                                                <div class="card-body">
+
+                                                    <span class="badge bg-success mb-2">
+
+                                                        Création
+
+                                                    </span>
+
+                                                    <div>
+
+                                                        <strong>Article ${change.article}</strong>
+
+                                                    </div>
+
+                                                    <div class="text-muted small mt-2">
+
+                                                        ${change.target}
+
+                                                    </div>
+
+                                                    <div class="mt-2">
+
+                                                        <span class="badge bg-light text-dark border">
+
+                                                            ${change.etat ?? "État non précisé"}
+
+                                                        </span>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    `).join("")}
+
+                                </div>
+                            `
+                            : ""
+                        }
+
+
+
+                        ${
+                            modifiedChanges.length > 0
+                            ? `
+                                <h4 class="h6 mt-4">
+                                    Dispositions modifiées (${modifiedChanges.length})
+                                </h4>
+
+                                <div class="row g-3">
+
+                                    ${modifiedChanges.map(change => `
+
+                                        <div class="col-md-6">
+
+                                            <div class="card h-100">
+
+                                                <div class="card-body">
+
+                                                    <span class="badge bg-secondary mb-2">
+
+                                                        Modification
+
+                                                    </span>
+
+                                                    <div>
+
+                                                        <strong>Article ${change.article}</strong>
+
+                                                    </div>
+
+                                                    <div class="text-muted small mt-2">
+
+                                                        ${change.target}
+
+                                                    </div>
+
+                                                    <div class="mt-2">
+
+                                                        <span class="badge bg-light text-dark border">
+
+                                                            ${change.etat ?? "État non précisé"}
+
+                                                        </span>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    `).join("")}
+
+                                </div>
+                            `
+                            : ""
+                        }
+                    `
+                    : ""
+                }
+
+                <hr class="my-4">
+                                <h3 class="h5 mt-4">
+                    <i class="bi bi-check2-square"></i>
+                    Ce qui change concrètement
+                </h3>
+
+                <div class="row g-3">
+
+                    ${changes.map(change => `
+
+                        <div class="col-md-6">
+
+                            <div class="card h-100">
+
+                                <div class="card-body">
+
+                                    <strong>${change.title}</strong>
+
+                                    <p class="text-muted small mt-2 mb-0">
+
+                                        ${change.description}
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    `).join("")}
+
+                </div>
+
+
+
+                <h3 class="h5 mt-4">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Points d'attention
+                </h3>
+
+                <div class="list-group">
+
+                    ${attentionPoints.map(point => `
+
+                        <div class="list-group-item">
+
+                            <strong>${point.title}</strong>
+
+                            <div class="text-muted small">
+
+                                ${point.description}
+
+                            </div>
+
+                        </div>
+
+                    `).join("")}
+
+                </div>
+
+
+
+                <h3 class="h5 mt-4">
+                    <i class="bi bi-link-45deg"></i>
+                    Sources officielles utilisées
+                </h3>
+
+                ${
+                    source
+                    ? `
+                        <div class="card">
+
+                            <div class="card-body">
+
+                                <strong>${source.title ?? ""}</strong><br>
+
+                                ${source.nature ?? ""}
+
+                                ${
+                                    source.jorfText
+                                    ? ` — ${source.jorfText}`
+                                    : ""
+                                }
+
+                                <br>
+
+                                État juridique :
+                                ${source.jurisState ?? "Non précisé"}<br>
+
+                                Version analysée :
+                                ${
+    source.dateDebutVersion &&
+    !isTechnicalDate(source.dateDebutVersion)
+        ? `version consolidée en vigueur depuis le ${formatDate(source.dateDebutVersion)}`
+        : "Version en vigueur"
+}<br>
+
+                                Identifiant :
+                                ${source.id ?? source.cid ?? ""}
+
+                                <div class="d-flex flex-wrap gap-2 mt-3">
+
+                                    ${
+                                        sourceLegiUrl
+                                        ? `
+                                            <a
+                                                class="btn btn-legis-outline btn-sm"
+                                                href="${sourceLegiUrl}"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                Texte consolidé Légifrance
+                                            </a>
+                                        `
+                                        : ""
+                                    }
+
+                                    ${
+                                        sourceJorfUrl
+                                        ? `
+                                            <a
+                                                class="btn btn-legis-outline btn-sm"
+                                                href="${sourceJorfUrl}"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                Journal officiel
+                                            </a>
+                                        `
+                                        : ""
+                                    }
+
+                                    ${
+                                        dossierUrl
+                                        ? `
+                                            <a
+                                                class="btn btn-legis-outline btn-sm"
+                                                href="${dossierUrl}"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                Dossier législatif
+                                            </a>
+                                        `
+                                        : ""
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    `
+                    : ""
+                }
+
+
+
+                ${
+                    sources.length > 0
+                    ? `
+                        <ul class="mt-3">
+
+                            ${sources.map(source => `
+
+                                <li>
+
+                                    <a
+                                        href="${source.url}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+
+                                        ${source.label}
+
+                                    </a>
+
+                                    — ${source.title}
+
+                                </li>
+
+                            `).join("")}
+
+                        </ul>
+                    `
+                    : ""
+                }
+
+            </div>
+        </div>
+    `;
+}
+
+</script>
+
+</body>
+</html>

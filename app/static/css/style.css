@@ -1,0 +1,81 @@
+
+        :root {
+            --legis-blue: #000091;
+            --legis-light: #f5f5ff;
+            --legis-border: #000091;
+        }
+
+        body {
+            background: #ffffff;
+        }
+
+        .search-zone {
+            background: var(--legis-light);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .main-search-input {
+            border: none;
+            border-bottom: 3px solid var(--legis-blue);
+            border-radius: 0;
+            font-size: 1.1rem;
+            padding: 1rem;
+        }
+
+        .main-search-button {
+            background: var(--legis-blue);
+            color: white;
+            border-radius: 0;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            font-weight: 600;
+        }
+
+        .main-search-button:hover {
+            background: #00006d;
+            color: white;
+        }
+
+        .options-box {
+            border: 2px solid var(--legis-border);
+            background: #ffffff;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .result-card {
+            border-left: 4px solid var(--legis-blue);
+        }
+
+        .badge-origin {
+            background: #e3e3fd;
+            color: var(--legis-blue);
+            border: 1px solid var(--legis-blue);
+        }
+
+        .btn-legis-outline {
+            border: 1px solid var(--legis-blue);
+            color: var(--legis-blue);
+            background: white;
+        }
+
+        .btn-legis-outline:hover {
+            background: var(--legis-blue);
+            color: white;
+        }
+
+        .impact-icon {
+            font-size: 2rem;
+            color: var(--legis-blue);
+        }
+
+        .timeline-dot {
+            width: 1.75rem;
+            height: 1.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+        }
+  

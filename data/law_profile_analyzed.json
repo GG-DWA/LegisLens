@@ -1,0 +1,58 @@
+{
+  "id": "JORFDOLE000048451240",
+  "title": "Projet de loi ratifiant l’ordonnance n° 2023-857 du 6 septembre 2023 relative à l’accessibilité des personnes sourdes, malentendantes, sourdaveugles et aphasiques aux services téléphoniques (ECOI2328958L)",
+  "type": "PROJET_LOI",
+  "legislature": "XVIème législature",
+  "sources": [
+    {
+      "label": "Projet de loi",
+      "url": "https://www.legifrance.gouv.fr/contenu/Media/files/autour-de-la-loi/legislatif-et-reglementaire/actualite-legislative/2023/pjl_ecoi2328958l_cm_22.11.2023.pdf",
+      "data": ":(PDF, 197 Ko)."
+    },
+    {
+      "label": "Exposé des motifs",
+      "url": "https://www.legifrance.gouv.fr/contenu/Media/files/autour-de-la-loi/legislatif-et-reglementaire/actualite-legislative/2023/exp_ecoi2328958l_cm_22.11.2023.pdf",
+      "data": ": (PDF, 210 Ko)."
+    },
+    {
+      "label": "Communiqué de presse du Conseil des ministres du 22 novembre 2023",
+      "url": "https://www.gouvernement.fr/conseil-des-ministres/compte-rendu-du-conseil-des-ministres-du-22-11-2023",
+      "data": ""
+    },
+    {
+      "label": "Dossier législatif de l'ordonnance",
+      "url": "https://www.legifrance.gouv.fr/dossierlegislatif/JORFDOLE000048050653/",
+      "data": ""
+    },
+    {
+      "label": "Dossier législatif de l'Assemblée nationale",
+      "url": "https://www.assemblee-nationale.fr/dyn/16/dossiers/ratification_ordonnance_ddaddue_aveugles",
+      "data": ""
+    }
+  ],
+  "impact_analysis": {
+    "actors": [
+      "personnes sourdes",
+      "personnes malentendantes",
+      "personnes sourdaveugles",
+      "personnes aphasiques",
+      "opérateurs de services téléphoniques",
+      "services publics"
+    ],
+    "sectors": [
+      "accessibilité",
+      "télécommunications",
+      "services publics numériques",
+      "inclusion"
+    ],
+    "main_changes": [
+      {
+        "title": "Ratification d'une ordonnance relative à l'accessibilité téléphonique",
+        "description": "Le texte vise à ratifier l'ordonnance n° 2023-857 concernant l'accessibilité des services téléphoniques pour certains publics en situation de handicap.",
+        "source": "Titre du projet de loi"
+      }
+    ],
+    "controversies": [],
+    "confidence": "manual_demo"
+  }
+}

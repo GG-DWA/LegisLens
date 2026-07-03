@@ -1,0 +1,109 @@
+{
+  "executionTime": 1,
+  "dereferenced": false,
+  "dossierLegislatif": {
+    "id": "JORFDOLE000048451240",
+    "ancienId": null,
+    "origine": "JORF",
+    "url": "dossiers_legislatifs/JORF/DOLE/00/00/48/45/12/JORFDOLE000048451240.xml",
+    "nature": null,
+    "titre": "Projet de loi ratifiant l’ordonnance n° 2023-857 du 6 septembre 2023 relative à l’accessibilité des personnes sourdes, malentendantes, sourdaveugles et aphasiques aux services téléphoniques (ECOI2328958L)",
+    "type": "PROJET_LOI",
+    "dateCreation": 1700697600000,
+    "dateDerniereModification": 1700697600000,
+    "legislature": {
+      "id": "16",
+      "libelle": "XVIème législature",
+      "dateDebut": 1655856000000,
+      "dateFin": 1717891200000
+    },
+    "echeancier": "",
+    "dateMajEcheancier": null,
+    "exposeMotif": "",
+    "arborescence": {
+      "niveaux": [
+        {
+          "id": "1700733520246",
+          "libelle": "Dossiers législatifs",
+          "niveaux": [
+            {
+              "id": "1700733520247",
+              "libelle": "Assemblée nationale",
+              "niveaux": [],
+              "liens": [
+                {
+                  "id": "1700734265056",
+                  "libelle": "Dossier législatif de l'Assemblée nationale",
+                  "lien": "https://www.assemblee-nationale.fr/dyn/16/dossiers/ratification_ordonnance_ddaddue_aveugles",
+                  "data": ""
+                }
+              ]
+            },
+            {
+              "id": "1700733520248",
+              "libelle": "Sénat",
+              "niveaux": [],
+              "liens": []
+            }
+          ],
+          "liens": [
+            {
+              "id": "1700734660956",
+              "libelle": "Dossier législatif de l'ordonnance",
+              "lien": "https://www.legifrance.gouv.fr/dossierlegislatif/JORFDOLE000048050653/",
+              "data": ""
+            }
+          ]
+        },
+        {
+          "id": "1700733520249",
+          "libelle": "Documents préparatoires",
+          "niveaux": [],
+          "liens": []
+        },
+        {
+          "id": "1700733520250",
+          "libelle": "Débats parlementaires",
+          "niveaux": [
+            {
+              "id": "1700733520251",
+              "libelle": "Assemblée nationale",
+              "niveaux": [],
+              "liens": []
+            },
+            {
+              "id": "1700733520252",
+              "libelle": "Sénat",
+              "niveaux": [],
+              "liens": []
+            }
+          ],
+          "liens": []
+        }
+      ],
+      "liens": [
+        {
+          "id": "1700733776168",
+          "libelle": "Projet de loi",
+          "lien": "https://www.legifrance.gouv.fr/contenu/Media/files/autour-de-la-loi/legislatif-et-reglementaire/actualite-legislative/2023/pjl_ecoi2328958l_cm_22.11.2023.pdf",
+          "data": ":(PDF, 197 Ko)."
+        },
+        {
+          "id": "1700734047968",
+          "libelle": "Exposé des motifs",
+          "lien": "https://www.legifrance.gouv.fr/contenu/Media/files/autour-de-la-loi/legislatif-et-reglementaire/actualite-legislative/2023/exp_ecoi2328958l_cm_22.11.2023.pdf",
+          "data": ": (PDF, 210 Ko)."
+        },
+        {
+          "id": "1703169118009",
+          "libelle": "Communiqué de presse du Conseil des ministres du 22 novembre 2023",
+          "lien": "https://www.gouvernement.fr/conseil-des-ministres/compte-rendu-du-conseil-des-ministres-du-22-11-2023",
+          "data": ""
+        }
+      ]
+    },
+    "dossiers": [],
+    "refInjection": "IG-20260121",
+    "idTechInjection": "JORFDOLE000048451240"
+  }
+}
