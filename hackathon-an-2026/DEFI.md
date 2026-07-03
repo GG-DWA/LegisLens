@@ -1,42 +1,92 @@
-### Nom du défi
+# Nom du défi
 
-LegisLens — Comprendre l'empreinte d'une loi
+LegisLens — Comprendre l'empreinte d'un texte officiel
 
-### Description courte
+# Description courte
 
-Un outil qui aide les citoyens à comprendre rapidement qui est concerné par une loi, quels secteurs sont impactés, quels changements sont introduits et quelles sont les sources officielles associées.
+Un outil qui aide les citoyens à comprendre rapidement qui est concerné par un texte officiel, quels secteurs sont impactés, quels changements sont introduits et quelles sont les sources officielles associées.
 
-### Porteur
+# Porteur
 
 Gulnur Moldobaeva
 
-### Description longue
+# Description longue
 
-Aujourd'hui, les textes législatifs et les dossiers parlementaires sont accessibles publiquement, mais restent souvent difficiles à comprendre pour les citoyens. Identifier rapidement qui est concerné par une loi, quels secteurs sont impactés et quels changements sont introduits nécessite de consulter de nombreuses sources et documents.
+Aujourd'hui, les textes législatifs, réglementaires et les dossiers parlementaires sont accessibles publiquement, mais restent souvent difficiles à comprendre pour les citoyens. Identifier rapidement qui est concerné par un texte, quels secteurs sont impactés et quels changements sont introduits nécessite de consulter de nombreuses sources et documents.
 
-LegisLens vise à rendre la loi plus lisible à partir des données officielles de l'Assemblée nationale et de Légifrance. L'outil analyse un projet ou une proposition de loi afin de présenter de manière claire les acteurs concernés, les secteurs impactés, les principaux changements, ainsi que les sources officielles permettant de vérifier l'information.
+LegisLens vise à rendre ces textes plus lisibles à partir des données officielles de Légifrance et de l'Assemblée nationale.
 
-L'objectif est de créer une interface simple permettant à chaque citoyen de comprendre l'empreinte d'une loi et son impact concret sur la société, tout en s'appuyant exclusivement sur des données publiques et vérifiables afin de limiter les risques d'erreur ou d'hallucination.
+L'application permet notamment de :
 
-### Image principale
+- rechercher des textes officiels (lois, codes, décrets, arrêtés, Constitution, etc.) ;
+- produire une analyse citoyenne compréhensible par tous ;
+- identifier les acteurs concernés ;
+- mettre en évidence les secteurs impactés ;
+- présenter les principaux changements introduits ;
+- visualiser le parcours et la chronologie du texte ;
+- accéder directement aux sources officielles ;
+- exporter l'analyse au format PDF.
 
-![Image principale](images/cover.png)
+L'objectif est de proposer une interface simple permettant à chacun de comprendre rapidement l'impact concret d'un texte officiel, tout en s'appuyant exclusivement sur des données publiques et vérifiables afin de limiter les risques d'erreur ou d'hallucination.
 
-### Contributeurs
+Pendant le hackathon, l'objectif est d'enrichir cette première version grâce aux données ouvertes de l'Assemblée nationale (dossiers législatifs, amendements, votes, comptes rendus...), d'améliorer l'expérience utilisateur et de développer de nouvelles visualisations des impacts des textes.
 
-* Gulnur Moldobaeva
+# Image principale
 
-### Ressources utilisées
+![Accueil](images/accueil.png)
 
-* [x] `an-dossiers-legislatifs` — Dossiers législatifs de l'Assemblée nationale (législature courante) ✺ Assemblée nationale
-* [x] `an-amendements-xvii` — Amendements déposés à l'Assemblée nationale (législature actuelle) ✺ Assemblée nationale
-* [x] `an-comptes-rendus` — Comptes rendus de la séance publique à l'Assemblée nationale (législature actuelle) ✺ Assemblée nationale
-* [x] `an-votes-xvii` — Votes des députés (législature actuelle) ✺ Assemblée nationale
-* [x] `premier-ministre-legi` — Codes, lois et règlements consolidés ✺ Premier ministre
-* [x] `premier-ministre-dole` — Dossiers législatifs Légifrance ✺ Premier ministre
-* [x] `premier-ministre-jorf` — Édition ''Lois et décrets'' du Journal officiel ✺ Premier ministre
+# Contributeurs
 
-### Galerie
+- Gulnur Moldobaeva
 
-### Documents
+(À compléter pendant le hackathon.)
+
+# Ressources utilisées
+
+Cochez les ressources utilisées en remplaçant [ ] par [x].
+
+- [x] premier-ministre-legi — Codes, lois et règlements consolidés ✺ Premier ministre
+- [x] premier-ministre-jorf — Édition « Lois et décrets » du Journal officiel ✺ Premier ministre
+- [x] premier-ministre-dole — Dossiers législatifs Légifrance ✺ Premier ministre
+
+### Ressources envisagées pendant le hackathon
+
+- [ ] an-dossiers-legislatifs — Dossiers législatifs de l'Assemblée nationale
+- [ ] an-amendements-xvii — Amendements déposés à l'Assemblée nationale
+- [ ] an-comptes-rendus — Comptes rendus de séance publique
+- [ ] an-votes-xvii — Votes des députés
+
+# Technologies
+
+- Python
+- FastAPI
+- HTML
+- CSS
+- JavaScript
+- API PISTE Légifrance
+- OpenAI
+- ReportLab (export PDF)
+
+# Galerie
+
+## Recherche
+
+![Recherche](images/accueil.png)
+
+## Recherche avancée
+
+![Recherche avancée](images/options-recherche.png)
+
+## Résultats de recherche
+
+![Résultats](images/resultats-recherche.png)
+
+## Analyse citoyenne
+
+![Analyse](images/analyse-citoyenne.png)
+
+# Documents
+
+- README.md
+- DEFI.md
 
