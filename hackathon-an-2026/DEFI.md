@@ -37,7 +37,9 @@ Pendant le hackathon, l'objectif est d'enrichir cette première version grâce a
 
 # Contributeurs
 
+- Agathe Delas
 - Gulnur Moldobaeva
+- 
 
 (À compléter pendant le hackathon.)
 
