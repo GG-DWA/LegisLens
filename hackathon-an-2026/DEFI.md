@@ -1,51 +1,58 @@
-# Nom du défi
+### Nom du défi
 
-LegisLens — Comprendre l'empreinte d'un texte officiel
+LegisLens — Comprendre l'empreinte d'une loi
 
-# Description courte
+### Description courte
 
-Un outil qui aide les citoyens à comprendre rapidement qui est concerné par un texte officiel, quels secteurs sont impactés, quels changements sont introduits et quelles sont les sources officielles associées.
+LegisLens est un outil qui aide les citoyens, les associations et les organisations à comprendre rapidement qui est concerné par une loi, quels secteurs sont impactés, quels changements sont introduits et quelles sont les sources officielles associées.
 
-# Porteur
+### Porteur
 
 Gulnur Moldobaeva
 
-# Description longue
+### Description longue
 
-Aujourd'hui, les textes législatifs, réglementaires et les dossiers parlementaires sont accessibles publiquement, mais restent souvent difficiles à comprendre pour les citoyens. Identifier rapidement qui est concerné par un texte, quels secteurs sont impactés et quels changements sont introduits nécessite de consulter de nombreuses sources et documents.
+Les textes législatifs, réglementaires et les dossiers parlementaires sont accessibles publiquement, mais leur compréhension reste souvent complexe.
 
-LegisLens vise à rendre ces textes plus lisibles à partir des données officielles de Légifrance et de l'Assemblée nationale.
+Identifier rapidement qui est concerné par une loi, quels secteurs sont impactés, quels changements sont introduits et quelles obligations en découlent nécessite aujourd'hui de consulter de nombreuses sources officielles.
+
+LegisLens vise à rendre ces informations plus accessibles grâce aux données publiques de Légifrance et, à terme, de l'Assemblée nationale.
 
 L'application permet notamment de :
 
-- rechercher des textes officiels (lois, codes, décrets, arrêtés, Constitution, etc.) ;
-- produire une analyse citoyenne compréhensible par tous ;
+- rechercher des textes officiels (codes, lois, décrets, ordonnances...) ;
+- produire une analyse citoyenne simplifiée ;
 - identifier les acteurs concernés ;
 - mettre en évidence les secteurs impactés ;
 - présenter les principaux changements introduits ;
-- visualiser le parcours et la chronologie du texte ;
+- visualiser le parcours d'un texte officiel ;
 - accéder directement aux sources officielles ;
 - exporter l'analyse au format PDF.
 
-L'objectif est de proposer une interface simple permettant à chacun de comprendre rapidement l'impact concret d'un texte officiel, tout en s'appuyant exclusivement sur des données publiques et vérifiables afin de limiter les risques d'erreur ou d'hallucination.
+Pendant le hackathon, nous avons développé une nouvelle fonctionnalité : **le Portail Association**.
 
-Pendant le hackathon, l'objectif est d'enrichir cette première version grâce aux données ouvertes de l'Assemblée nationale (dossiers législatifs, amendements, votes, comptes rendus...), d'améliorer l'expérience utilisateur et de développer de nouvelles visualisations des impacts des textes.
+Une association peut simplement renseigner l'adresse de son site Internet.
 
-# Image principale
+LegisLens analyse automatiquement son activité, identifie les domaines dans lesquels elle intervient ainsi que les publics concernés, puis prépare une veille législative personnalisée en proposant les recherches juridiques les plus pertinentes.
 
-![Accueil](images/accueil.png)
+Cette fonctionnalité constitue une première étape vers un suivi automatisé des évolutions législatives susceptibles d'avoir un impact sur les associations.
 
-# Contributeurs
+À terme, LegisLens pourra également exploiter les données ouvertes de l'Assemblée nationale afin d'intégrer les dossiers législatifs, les amendements, les débats parlementaires et les votes pour offrir une vision complète du cycle de vie d'une loi.
 
-- Agathe Delas
+Toutes les informations présentées reposent exclusivement sur des données publiques et des sources officielles afin de proposer une information fiable, transparente et facilement compréhensible.
+
+### Image principale
+
+![Accueil](images/home.png)
+
+### Contributeurs
+
 - Gulnur Moldobaeva
-- 
+- Agathe Delas
 
-(À compléter pendant le hackathon.)
+### Ressources utilisées
 
-# Ressources utilisées
-
-Cochez les ressources utilisées en remplaçant [ ] par [x].
+Cochez les ressources utilisées en remplaçant **[ ]** par **[x]**.
 
 - [x] premier-ministre-legi — Codes, lois et règlements consolidés ✺ Premier ministre
 - [x] premier-ministre-jorf — Édition « Lois et décrets » du Journal officiel ✺ Premier ministre
@@ -58,7 +65,7 @@ Cochez les ressources utilisées en remplaçant [ ] par [x].
 - [ ] an-comptes-rendus — Comptes rendus de séance publique
 - [ ] an-votes-xvii — Votes des députés
 
-# Technologies
+### Technologies
 
 - Python
 - FastAPI
@@ -66,29 +73,34 @@ Cochez les ressources utilisées en remplaçant [ ] par [x].
 - CSS
 - JavaScript
 - API PISTE Légifrance
-- OpenAI
+- Hugging Face Sentence Transformers
+- Groq
 - ReportLab (export PDF)
 
-# Galerie
+### Galerie
 
-## Recherche
+#### Accueil
 
-![Recherche](images/accueil.png)
+![Accueil](images/home.png)
 
-## Recherche avancée
+#### Recherche avancée
 
-![Recherche avancée](images/options-recherche.png)
+![Recherche avancée](images/search-options.png)
 
-## Résultats de recherche
+#### Résultats de recherche
 
-![Résultats](images/resultats-recherche.png)
+![Résultats](images/search-results.png)
 
-## Analyse citoyenne
+#### Analyse citoyenne
 
-![Analyse](images/analyse-citoyenne.png)
+![Analyse citoyenne](images/law-analysis.png)
 
-# Documents
+#### Portail Association
+
+
+
+### Documents
 
 - README.md
 - DEFI.md
-
+- docs/LegisLens_demo.mp4
