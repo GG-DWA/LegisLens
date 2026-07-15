@@ -103,4 +103,4 @@ Cochez les ressources utilisées en remplaçant **[ ]** par **[x]**.
 
 - README.md
 - DEFI.md
-- [Vidéo de démonstration](docs/LegisLens_demo.mp4)
+- 🎥 [Vidéo de démonstration de LegisLens](https://raw.githubusercontent.com/GG-DWA/LegisLens/main/hackathon-an-2026/docs/LegisLens_demo.mp4)
