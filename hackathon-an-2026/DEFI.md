@@ -103,4 +103,4 @@ Cochez les ressources utilisées en remplaçant **[ ]** par **[x]**.
 
 - README.md
 - DEFI.md
-- docs/LegisLens_demo.mp4
+- [Vidéo de démonstration](docs/LegisLens_demo.mp4)
